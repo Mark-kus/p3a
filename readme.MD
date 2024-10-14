@@ -8,6 +8,12 @@ Utilizando como punto de partida la aplicación que cada uno viene realizando, i
 
 ---
 
+
+Tarea: Aplicar el patrón observador a su aplicación
+
+
+---
+
 La entrega final se aprueba con los cuatro primeros puntos descritos a continuación.
 
 1.  POO
