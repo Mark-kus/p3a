@@ -39,7 +39,7 @@ async def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_
     if not exists:
         raise HTTPException(status_code=404, detail="User not found")
 
-    pass
+    return UserModel().update(db, user_id, UserModel(**user.model_dump()))
 
 
 @user_router.delete("/{user_id}")
