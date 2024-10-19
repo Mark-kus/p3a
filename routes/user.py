@@ -3,9 +3,12 @@ from sqlalchemy.orm import Session
 
 from models.user import UserModel
 from database import get_db
-from schemas.user import User, UserCreate
+from schemas.user import UserCreate
+from patterns.observer import Subject, EmailNotifier
 
 user_router = APIRouter()
+user_subject = Subject()
+email_notifier = EmailNotifier(user_subject)
 
 
 @user_router.get("/")
@@ -30,7 +33,9 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @user_router.post("/")
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return UserModel().create(db, UserModel(**user.model_dump()))
+    user = UserModel().create(db, UserModel(**user.model_dump()))
+    user_subject.notify("Usuario creado")
+    return user
 
 
 @user_router.put("/{user_id}")
@@ -39,7 +44,9 @@ async def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_
     if not exists:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return UserModel().update(db, user_id, UserModel(**user.model_dump()))
+    user = UserModel().update(db, user_id, UserModel(**user.model_dump()))
+    user_subject.notify("Usuario actualizado")
+    return user
 
 
 @user_router.delete("/{user_id}")
@@ -48,4 +55,6 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     if not exists:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return UserModel().delete(db, user_id)
+    user = UserModel().delete(db, user_id)
+    user_subject.notify("Usuario eliminado")
+    return user
