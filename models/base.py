@@ -21,7 +21,13 @@ def model_methods(cls: type):
         return entity
 
     def update(db: Session, id: int, entity):
-        pass
+        primary_key_name = cls.__table__.primary_key.columns.keys()[0]
+        entity_dict = entity.__dict__
+        entity_dict.pop("_sa_instance_state", None)
+
+        db.query(cls).filter(getattr(cls, primary_key_name) == id).update(entity_dict)
+        db.commit()
+        return db.query(cls).get(id)
 
     def delete(db: Session, id: int):
         entity = db.query(cls).get(id)
